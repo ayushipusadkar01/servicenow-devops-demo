@@ -53,9 +53,7 @@ jobs:
     needs: change
     runs-on: ubuntu-latest
 
-    steps:
-     - name: Deploy application
-       run: echo "Application deployed successfully"
+   
 
     steps:
       - name: Deploy application
