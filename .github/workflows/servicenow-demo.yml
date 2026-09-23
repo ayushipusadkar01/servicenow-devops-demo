@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      
 
 jobs:
 
@@ -29,10 +28,34 @@ jobs:
       - name: Run tests
         run: echo "Running application tests..."
 
-  deploy:
-    name: Deploy
+  change:
+    name: ServiceNow Change
     needs: test
     runs-on: ubuntu-latest
+
+    steps:
+      - name: ServiceNow DevOps Change Automation
+        uses: ServiceNow/servicenow-devops-change@v6.1.0
+        id: create
+        with:
+          devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
+          devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'ServiceNow Change'
+          change-request: '{"setCloseCode":"true","autoCloseChange":true,"attributes":{"short_description":"Automated deployment from GitHub","description":"Change automatically created from GitHub Actions using ServiceNow DevOps Change Velocity.","assignment_group":"a715cd759f2002002920bde8132e7018","implementation_plan":"Deploy application using GitHub Actions pipeline.","backout_plan":"Rollback to the previous successful application version if deployment fails.","test_plan":"Validate the application after deployment."}}'
+          interval: '100'
+          timeout: '3600'
+
+  deploy:
+    name: Deploy
+    needs: change
+    runs-on: ubuntu-latest
+
+    steps:
+     - name: Deploy application
+       run: echo "Application deployed successfully"
 
     steps:
       - name: Deploy application
