@@ -3,7 +3,7 @@ name: servicenow-demo.yml
 on:
   workflow_dispatch:
   push:
-    branches:
+    branches: 
       - main
 
 jobs:
